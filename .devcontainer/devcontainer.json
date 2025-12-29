@@ -1,0 +1,39 @@
+{
+	"name": "CRANE-X7 ROS2 Humble",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"workspaceFolder": "/workspace",
+	"workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+	"runArgs": [
+		"--network=host",
+		"--privileged",
+		"--cap-add=SYS_PTRACE",
+		"--security-opt=seccomp=unconfined"
+	],
+	"containerEnv": {
+		"DISPLAY": "${localEnv:DISPLAY}",
+		"QT_X11_NO_MITSHM": "1",
+		"LIBGL_ALWAYS_SOFTWARE": "1"
+	},
+	"mounts": [
+		"source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind",
+		"source=/dev/dri,target=/dev/dri,type=bind"
+	],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-vscode.cpptools",
+				"ms-python.python",
+				"ms-iot.vscode-ros",
+				"GitHub.copilot",
+				"GitHub.copilot-chat"
+			]
+		}
+	},
+	"postCreateCommand": "bash /workspace/scripts/setup.sh",
+	"remoteUser": "root",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
+	}
+}
