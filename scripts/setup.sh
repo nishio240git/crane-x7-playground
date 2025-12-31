@@ -7,6 +7,8 @@ echo "Setting up workspace..."
 echo "Configuring git safe directories..."
 git config --global --add safe.directory /workspace
 git config --global --add safe.directory /workspace/src/crane_x7_ros
+git config --global --add safe.directory /workspace/src/octo
+git config --global --add safe.directory /workspace/src/rt_manipulators_cpp
 
 # Update package lists
 echo "Updating apt package lists..."
@@ -52,6 +54,13 @@ rm -rf /workspace/src/build /workspace/src/install /workspace/src/log
 # Install ROS dependencies
 echo "Installing ROS dependencies..."
 rosdep install -r -y -i --from-paths src --rosdistro ${ROS_DISTRO}
+
+# Install Octo package
+echo "Installing Octo package..."
+cd /workspace/src/octo
+pip3 install -e .
+pip3 install git+https://github.com/kvablack/dlimp@5edaa4691567873d495633f2708982b42edf1972
+cd /workspace
 
 # Create symlinks for header compatibility (.h -> .hpp)
 echo "Creating header file symlinks for compatibility..."

@@ -1,8 +1,15 @@
 [submodule "src/crane_x7_ros"]
-	path = src/crane_x7_ros
-	url = https://github.com/rt-net/crane_x7_ros.git
-	branch = humble
+path = src/crane_x7_ros
+url = https://github.com/rt-net/crane_x7_ros.git
+branch = humble
 [submodule "src/crane_x7_description"]
-	path = src/crane_x7_description
-	url = https://github.com/rt-net/crane_x7_description.git
-	branch = humble
+path = src/crane_x7_description
+url = https://github.com/rt-net/crane_x7_description.git
+branch = humble
+[submodule "src/octo"]
+path = src/octo
+url = https://github.com/octo-models/octo
+[submodule "src/rt_manipulators_cpp"]
+	path = src/rt_manipulators_cpp
+	url = https://github.com/rt-net/rt_manipulators_cpp.git
+	branch = ros2
