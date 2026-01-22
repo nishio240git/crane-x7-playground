@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/opt/octo_env/bin/python
 """
 Octo動作確認スクリプト
 """

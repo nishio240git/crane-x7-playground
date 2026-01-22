@@ -1,8 +1,8 @@
-FROM osrf/ros:humble-desktop-full
+FROM osrf/ros:jazzy-desktop-full
 
 # 環境変数の設定
 ENV DEBIAN_FRONTEND=noninteractive
-ENV ROS_DISTRO=humble
+ENV ROS_DISTRO=jazzy
 
 # 必要なパッケージのインストール
 RUN apt-get update && apt-get install -y \
@@ -10,22 +10,32 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     python3-colcon-common-extensions \
     python3-rosdep \
-    ros-${ROS_DISTRO}-gazebo-ros-pkgs \
     ros-${ROS_DISTRO}-ros2-control \
     ros-${ROS_DISTRO}-ros2-controllers \
-    ros-${ROS_DISTRO}-gazebo-ros2-control \
     ros-${ROS_DISTRO}-xacro \
     ros-${ROS_DISTRO}-joint-state-publisher \
     ros-${ROS_DISTRO}-joint-state-publisher-gui \
     ros-${ROS_DISTRO}-moveit \
-    python3-venv \
+    software-properties-common \
     && rm -rf /var/lib/apt/lists/*
 
-# Octoの依存関係をインストール
-RUN pip3 install --upgrade pip
-# JAXとjaxlibを先にインストール（バージョンを揃える）
-RUN pip3 install jax==0.4.20 jaxlib==0.4.20
-RUN pip3 install \
+# Python 3.10をインストール（Octo用）
+RUN add-apt-repository ppa:deadsnakes/ppa -y && \
+    apt-get update && \
+    apt-get install -y \
+    python3.10 \
+    python3.10-venv \
+    python3.10-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Octo用のPython 3.10仮想環境を作成
+RUN python3.10 -m venv /opt/octo_env
+ENV OCTO_VENV=/opt/octo_env
+
+# 仮想環境内にOctoの依存関係をインストール
+RUN /opt/octo_env/bin/pip install --upgrade pip && \
+    /opt/octo_env/bin/pip install jax==0.4.20 jaxlib==0.4.20 && \
+    /opt/octo_env/bin/pip install \
     gym>=0.26 \
     numpy==1.24.3 \
     ml_dtypes==0.2.0 \
@@ -55,6 +65,8 @@ RUN pip3 install \
 WORKDIR /workspace
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
 RUN echo "if [ -f /workspace/install/setup.bash ]; then source /workspace/install/setup.bash; fi" >> ~/.bashrc
+RUN echo "# Octoを使う場合は: source /opt/octo_env/bin/activate" >> ~/.bashrc
+RUN echo "alias activate-octo='source /opt/octo_env/bin/activate'" >> ~/.bashrc
 
 # rosdepの初期化
 RUN rosdep update

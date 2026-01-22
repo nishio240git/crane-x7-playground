@@ -31,17 +31,19 @@ fi
 # Initialize and update submodules
 git submodule update --init --recursive
 # Checkout the correct branch
-echo "Checking out humble branch..."
+echo "Checking out jazzy branch..."
 cd /workspace/src/crane_x7_ros
-git checkout humble
+git checkout jazzy
+cd /workspace/src/crane_x7_description
+git checkout jazzy
 cd /workspace
 
-# Apply patches for ROS 2 Humble compatibility
-echo "Applying compatibility patches..."
+# Apply patches for ROS 2 Humble compatibility (only if needed)
+echo "Checking if compatibility patches are needed..."
 cd /workspace/src/crane_x7_ros
 if [ -f /workspace/scripts/crane_x7_fixes.patch ]; then
-    git apply /workspace/scripts/crane_x7_fixes.patch
-    echo "Patches applied successfully"
+    # Try to apply patch, but don't fail if already applied
+    git apply /workspace/scripts/crane_x7_fixes.patch 2>/dev/null && echo "Patches applied successfully" || echo "Patches already applied or not needed for this branch"
 else
     echo "Warning: patch file not found, skipping patch application"
 fi
@@ -55,33 +57,33 @@ rm -rf /workspace/src/build /workspace/src/install /workspace/src/log
 echo "Installing ROS dependencies..."
 rosdep install -r -y -i --from-paths src --rosdistro ${ROS_DISTRO}
 
-# Install Octo package
-echo "Installing Octo package..."
+# Install Octo package (in Python 3.10 venv)
+echo "Installing Octo package in virtual environment..."
 cd /workspace/src/octo
-pip3 install -e .
-pip3 install git+https://github.com/kvablack/dlimp@5edaa4691567873d495633f2708982b42edf1972
+/opt/octo_env/bin/pip install -e .
+/opt/octo_env/bin/pip install git+https://github.com/kvablack/dlimp@5edaa4691567873d495633f2708982b42edf1972
 cd /workspace
 
 # Create symlinks for header compatibility (.h -> .hpp)
 echo "Creating header file symlinks for compatibility..."
 # MoveIt headers
-if [ -f /opt/ros/humble/include/moveit/move_group_interface/move_group_interface.h ]; then
-    ln -sf /opt/ros/humble/include/moveit/move_group_interface/move_group_interface.h \
-           /opt/ros/humble/include/moveit/move_group_interface/move_group_interface.hpp
+if [ -f /opt/ros/jazzy/include/moveit/move_group_interface/move_group_interface.h ]; then
+    ln -sf /opt/ros/jazzy/include/moveit/move_group_interface/move_group_interface.h \
+           /opt/ros/jazzy/include/moveit/move_group_interface/move_group_interface.hpp
 fi
-if [ -f /opt/ros/humble/include/moveit/planning_scene_interface/planning_scene_interface.h ]; then
-    ln -sf /opt/ros/humble/include/moveit/planning_scene_interface/planning_scene_interface.h \
-           /opt/ros/humble/include/moveit/planning_scene_interface/planning_scene_interface.hpp
+if [ -f /opt/ros/jazzy/include/moveit/planning_scene_interface/planning_scene_interface.h ]; then
+    ln -sf /opt/ros/jazzy/include/moveit/planning_scene_interface/planning_scene_interface.h \
+           /opt/ros/jazzy/include/moveit/planning_scene_interface/planning_scene_interface.hpp
 fi
 # cv_bridge headers
-if [ -f /opt/ros/humble/include/cv_bridge/cv_bridge/cv_bridge.h ]; then
-    ln -sf /opt/ros/humble/include/cv_bridge/cv_bridge/cv_bridge.h \
-           /opt/ros/humble/include/cv_bridge/cv_bridge/cv_bridge.hpp
+if [ -f /opt/ros/jazzy/include/cv_bridge/cv_bridge/cv_bridge.h ]; then
+    ln -sf /opt/ros/jazzy/include/cv_bridge/cv_bridge/cv_bridge.h \
+           /opt/ros/jazzy/include/cv_bridge/cv_bridge/cv_bridge.hpp
 fi
 # image_geometry headers
-if [ -f /opt/ros/humble/include/image_geometry/image_geometry/pinhole_camera_model.h ]; then
-    ln -sf /opt/ros/humble/include/image_geometry/image_geometry/pinhole_camera_model.h \
-           /opt/ros/humble/include/image_geometry/image_geometry/pinhole_camera_model.hpp
+if [ -f /opt/ros/jazzy/include/image_geometry/image_geometry/pinhole_camera_model.h ]; then
+    ln -sf /opt/ros/jazzy/include/image_geometry/image_geometry/pinhole_camera_model.h \
+           /opt/ros/jazzy/include/image_geometry/image_geometry/pinhole_camera_model.hpp
 fi
 
 echo "Setup completed successfully!"
