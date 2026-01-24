@@ -3,3 +3,5 @@ install
 log
 src/crane_x7_ros/install
 src/crane_x7_ros/log
+__pycache__
+*.pyc
