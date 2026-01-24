@@ -32,7 +32,8 @@
 		}
 	},
 	"postCreateCommand": "bash /workspace/scripts/setup.sh",
-	"remoteUser": "root",
+	"remoteUser": "vscode",
+	"updateRemoteUserUID": true,
 	"features": {
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
 	}

@@ -12,7 +12,8 @@ git config --global --add safe.directory /workspace/src/rt_manipulators_cpp
 
 # Update package lists
 echo "Updating apt package lists..."
-apt-get update
+sudo mkdir -p /var/lib/apt/lists/partial
+sudo apt-get update
 
 # Update rosdep
 echo "Updating rosdep..."
@@ -68,21 +69,21 @@ cd /workspace
 echo "Creating header file symlinks for compatibility..."
 # MoveIt headers
 if [ -f /opt/ros/jazzy/include/moveit/move_group_interface/move_group_interface.h ]; then
-    ln -sf /opt/ros/jazzy/include/moveit/move_group_interface/move_group_interface.h \
+    sudo ln -sf /opt/ros/jazzy/include/moveit/move_group_interface/move_group_interface.h \
            /opt/ros/jazzy/include/moveit/move_group_interface/move_group_interface.hpp
 fi
 if [ -f /opt/ros/jazzy/include/moveit/planning_scene_interface/planning_scene_interface.h ]; then
-    ln -sf /opt/ros/jazzy/include/moveit/planning_scene_interface/planning_scene_interface.h \
+    sudo ln -sf /opt/ros/jazzy/include/moveit/planning_scene_interface/planning_scene_interface.h \
            /opt/ros/jazzy/include/moveit/planning_scene_interface/planning_scene_interface.hpp
 fi
 # cv_bridge headers
 if [ -f /opt/ros/jazzy/include/cv_bridge/cv_bridge/cv_bridge.h ]; then
-    ln -sf /opt/ros/jazzy/include/cv_bridge/cv_bridge/cv_bridge.h \
+    sudo ln -sf /opt/ros/jazzy/include/cv_bridge/cv_bridge/cv_bridge.h \
            /opt/ros/jazzy/include/cv_bridge/cv_bridge/cv_bridge.hpp
 fi
 # image_geometry headers
 if [ -f /opt/ros/jazzy/include/image_geometry/image_geometry/pinhole_camera_model.h ]; then
-    ln -sf /opt/ros/jazzy/include/image_geometry/image_geometry/pinhole_camera_model.h \
+    sudo ln -sf /opt/ros/jazzy/include/image_geometry/image_geometry/pinhole_camera_model.h \
            /opt/ros/jazzy/include/image_geometry/image_geometry/pinhole_camera_model.hpp
 fi
 

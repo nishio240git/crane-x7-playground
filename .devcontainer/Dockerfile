@@ -4,6 +4,18 @@ FROM osrf/ros:jazzy-desktop-full
 ENV DEBIAN_FRONTEND=noninteractive
 ENV ROS_DISTRO=jazzy
 
+# 非rootユーザーの作成
+ARG USERNAME=vscode
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+RUN apt-get update \
+    && apt-get install -y sudo \
+    && (groupadd --gid $USER_GID $USERNAME || true) \
+    && (useradd --uid $USER_UID --gid $USER_GID -m $USERNAME || usermod -l $USERNAME -d /home/$USERNAME -m $(getent passwd $USER_UID | cut -d: -f1) || true) \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
 # 必要なパッケージのインストール
 RUN apt-get update && apt-get install -y \
     git \
@@ -29,7 +41,8 @@ RUN add-apt-repository ppa:deadsnakes/ppa -y && \
     && rm -rf /var/lib/apt/lists/*
 
 # Octo用のPython 3.10仮想環境を作成
-RUN python3.10 -m venv /opt/octo_env
+RUN python3.10 -m venv /opt/octo_env && \
+    chown -R ${USER_UID}:${USER_GID} /opt/octo_env
 ENV OCTO_VENV=/opt/octo_env
 
 # 仮想環境内にOctoの依存関係をインストール
@@ -63,10 +76,15 @@ RUN /opt/octo_env/bin/pip install --upgrade pip && \
 
 # ワークスペースの設定
 WORKDIR /workspace
-RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
-RUN echo "if [ -f /workspace/install/setup.bash ]; then source /workspace/install/setup.bash; fi" >> ~/.bashrc
-RUN echo "# Octoを使う場合は: source /opt/octo_env/bin/activate" >> ~/.bashrc
-RUN echo "alias activate-octo='source /opt/octo_env/bin/activate'" >> ~/.bashrc
+
+# vscodeユーザーの.bashrcに設定を追加
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/$USERNAME/.bashrc
+RUN echo "if [ -f /workspace/install/setup.bash ]; then source /workspace/install/setup.bash; fi" >> /home/$USERNAME/.bashrc
+RUN echo "# Octoを使う場合は: source /opt/octo_env/bin/activate" >> /home/$USERNAME/.bashrc
+RUN echo "alias activate-octo='source /opt/octo_env/bin/activate'" >> /home/$USERNAME/.bashrc
 
 # rosdepの初期化
 RUN rosdep update
+
+# vscodeユーザーに切り替え
+USER $USERNAME
